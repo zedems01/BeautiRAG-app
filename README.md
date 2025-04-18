@@ -6,7 +6,7 @@
 </p>
 
 
-BeautiRAG is a multi-modal Retrieval-Augmented Generation (RAG) application built with Next.js for the frontend, LangChain framework and FastAPI for the backend. It allows to upload various document types (text, PDF, images, audio), processes them, stores embeddings locally using FAISS, and provides a chat interface to query the documents using large language models (LLMs).
+BeautiRAG is a multimodal Retrieval-Augmented Generation (RAG) application built with Next.js for the frontend, LangChain framework and FastAPI for the backend. It allows to upload various document types (text, PDF, images, audio), processes them, stores embeddings locally using FAISS, and provides a chat interface to query the documents using large language models (LLMs).
 
 ## Features
 
