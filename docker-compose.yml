@@ -4,7 +4,6 @@ services:
       context: ./beautirag-app/src/backend
       dockerfile: Dockerfile
     container_name: beautirag-backend
-    # Environment variables can be loaded from a .env file in the backend context
     env_file:
       - ./beautirag-app/.env
     # Mount the data directory as a volume to persist the FAISS index and processed files
@@ -12,13 +11,12 @@ services:
       - ./beautirag-app/src/backend/data:/app_root/backend/data
     ports:
       - "8000:8000"
-    # Add healthcheck
     healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:8000/"]
         interval: 300s
         timeout: 10s
         retries: 3
-        start_period: 30s # Give time for whisper/embeddings models to load
+        start_period: 30s
     restart: unless-stopped
 
   frontend:
@@ -28,11 +26,9 @@ services:
     container_name: beautirag-frontend
     ports:
       - "3000:3000"
-    # Make frontend depend on backend being healthy (if healthcheck is enabled)
     depends_on:
       backend:
           condition: service_healthy
-    # Ensure frontend can reach backend via its service name
     environment:
       - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
     restart: unless-stopped

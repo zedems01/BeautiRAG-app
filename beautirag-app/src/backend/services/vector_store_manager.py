@@ -79,17 +79,17 @@ def add_documents_to_store(documents: List[Document]):
 
     try:
         if _vector_store is None:
-            # Create a new store if it doesn't exist
+            # new store if it doesn't exist
             logger.info("Creating a new FAISS vector store.")
             _vector_store = FAISS.from_documents(chunks, embedding_model)
             logger.info("New FAISS store created.")
         else:
-            # Add documents to the existing store
+            # add documents to the existing store
             logger.info(f"Adding {len(chunks)} chunks to the existing FAISS store.")
             _vector_store.add_documents(chunks)
             logger.info("Chunks added to the existing store.")
 
-        # Save the updated index
+        # saving updated index
         logger.info(f"Saving FAISS index to: {FAISS_INDEX_FILE}")
         _vector_store.save_local(str(FAISS_INDEX_DIR), index_name="beautirag_index")
         logger.info("FAISS index saved successfully.")
@@ -97,9 +97,4 @@ def add_documents_to_store(documents: List[Document]):
     except Exception as e:
         logger.error(f"Failed to add documents or save FAISS index: {e}", exc_info=True)
 
-# Initialize store on load
 get_vector_store()
-
-if __name__ == '__main__':
-    # Test code (todo further...)
-    pass

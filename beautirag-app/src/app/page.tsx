@@ -6,20 +6,18 @@ import DocumentUpload from "@/components/DocumentUpload";
 import ModelSelection from "@/components/ModelSelection";
 import ChatInterface from "@/components/ChatInterface";
 
-// Structure for the validated configuration
 interface ValidatedConfig {
   model: string;
   apiKey: string;
 }
 
 export default function Home() {
-  // State to hold the configuration *after* validation in ModelSelection
+  // State to hold the configuration after validation
   const [validatedConfig, setValidatedConfig] = useState<ValidatedConfig>({
-    model: 'gpt-4o', // Default model
+    model: 'gpt-4o',
     apiKey: '',
   });
 
-  // Handler called by ModelSelection when user clicks "Validate"
   const handleConfigValidated = (model: string, apiKey: string) => {
     console.log('Configuration validated in parent:', { model, apiKey });
     setValidatedConfig({ model, apiKey });
@@ -33,9 +31,7 @@ export default function Home() {
         </h1>
       </div>
 
-      {/* Main Content Area */}
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8 mb-0.5">
-        {/* Left Column: Upload and Config */}
         <div className="lg:col-span-1 flex flex-col gap-8">
           <DocumentUpload />
           <ModelSelection
@@ -44,7 +40,6 @@ export default function Home() {
           />
         </div>
 
-        {/* Right Column: Chat Interface */}
         <div className="lg:col-span-2">
           <ChatInterface
             selectedModel={validatedConfig.model}
@@ -53,9 +48,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* <footer className="w-full max-w-6xl text-center text-gray-500 text-sm mt-5">
-         Built with Next.js, FastAPI, LangChain, by Zedems
-      </footer> */}
       <footer className="w-full max-w-6xl text-center text-gray-500 text-sm mt-5">
         Built with Next.js, FastAPI, LangChain, by{" "}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">

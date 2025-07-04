@@ -3,14 +3,12 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-// Simple SVG Upload Icon
 const UploadIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
   </svg>
 );
 
-// Define status types
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
 
 const DocumentUpload: React.FC = () => {
@@ -31,7 +29,6 @@ const DocumentUpload: React.FC = () => {
     });
 
     try {
-      // Use environment variable for backend URL
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const response = await fetch(`${backendUrl}/upload/`, {
         method: 'POST',
@@ -47,14 +44,13 @@ const DocumentUpload: React.FC = () => {
       setStatus('success');
       setMessage(result.message || 'Files uploaded successfully!');
       
-      // setUploadedFiles([]);   // To clear uploaded files list on success?
+      // setUploadedFiles([]);
       console.log('Upload successful:', result);
 
     } catch (error) {
       console.error('Upload error:', error);
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'An unknown error occurred');
-      // Keep files in list on error so user can see what failed
     }
   }, []);
 
@@ -88,7 +84,6 @@ const DocumentUpload: React.FC = () => {
         <p className="text-xs mt-3 text-gray-500">Supported: TXT, PDF, DOCX, PNG, JPEG, MP3, WAV</p>
       </div>
 
-      {/* Status Message Area */}
       {status !== 'idle' && (
         <div className={`mt-4 p-3 rounded text-center text-sm ${status === 'uploading' ? 'bg-blue-900/50 text-blue-300' : status === 'success' ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'}`}>
           {message}

@@ -9,11 +9,9 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-# Local imports
 from .core.config import UPLOADED_FILES_DIR
 from .services import document_processor, vector_store_manager, rag_pipeline
 
-# Setup logging for log messages
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -24,9 +22,9 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Configure CORS
+# Configure CORS to allow Next.js frontend
 origins = [
-    "http://localhost:3000",  # Allow Next.js frontend
+    "http://localhost:3000",
     "localhost:3000"
 ]
 
@@ -53,19 +51,15 @@ async def upload_documents(files: List[UploadFile] = File(...)):
 
     for file in files:
         try:
-            # Ensure upload directory exists
             UPLOADED_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
-            # Create a safe filepath
             file_location = UPLOADED_FILES_DIR / file.filename
             logger.info(f"Attempting to save uploaded file to: {file_location}")
 
-            # Save the uploaded file
             with open(file_location, "wb+") as file_object:
                 shutil.copyfileobj(file.file, file_object)
             logger.info(f"Successfully saved uploaded file: {file.filename}")
 
-            # Process the saved document
             logger.info(f"Processing document: {file.filename}")
             processed_docs = document_processor.load_and_process_document(file_location)
 
@@ -75,13 +69,11 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                 logger.info(f"Successfully processed {file.filename}, found {len(processed_docs)} sections.")
             else:
                 logger.warning(f"No content extracted from {file.filename}.")
-                # Add to failed_files if partial success isn't desired
                 failed_files.append(file.filename)
 
         except Exception as e:
             logger.error(f"Failed to process file {file.filename}: {e}", exc_info=True)
             failed_files.append(file.filename)
-            # Clean up saved file if processing failed
             if file_location.exists():
                 file_location.unlink()
 
@@ -94,7 +86,6 @@ async def upload_documents(files: List[UploadFile] = File(...)):
             logger.info("Successfully updated vector store.")
         except Exception as e:
             logger.error(f"Failed to add documents to vector store: {e}", exc_info=True)
-            # Return partial success but indicate store update failure
             return HTTPException(status_code=500, detail=f"Files processed, but failed to update vector store: {e}")
 
     if not processed_files_count and failed_files:

@@ -1,14 +1,11 @@
-# Notebook test
 ipywidgets
 ipykernel
 jupyter
 
-# Core Frameworks
 fastapi
 uvicorn[standard]
 python-dotenv
 
-# LangChain & Vector DB
 langchain
 langchain-community 
 faiss-cpu 
@@ -16,25 +13,19 @@ langchain_openai
 langchain_anthropic
 langchain_deepseek
 
-# Document Loaders
 pypdf
 python-docx
 docx2txt
 libmagic
 unstructured[local-inference]
-unstructured # handles various formats
+unstructured
 
-
-# Image Processing (OCR)
 Pillow
 pytesseract
 
-# Audio Processing (Transcription)
-# Whisper requires ffmpeg to be installed on the system
 openai-whisper
 
-# Embeddings
 sentence-transformers
 
-# API Specific
-python-multipart # For FastAPI file uploads
+# FastAPI file uploads
+python-multipart

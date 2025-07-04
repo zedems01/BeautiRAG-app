@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 
-// Eye Icons
 const EyeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -16,67 +15,58 @@ const EyeOffIcon = () => (
   </svg>
 );
 
-// Define props for the component
 interface ModelSelectionProps {
   onConfigValidated: (model: string, apiKey: string) => void; 
-  defaultModel?: string; // Optional initial model
+  defaultModel?: string;
 }
 
 const ModelSelection: React.FC<ModelSelectionProps> = ({ onConfigValidated, defaultModel }) => {
-  // Internal state for model selection and API key
   const [selectedModel, setSelectedModel] = useState<string>(defaultModel || 'gpt-4o');
   const [apiKey, setApiKey] = useState<string>('');
   const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
   const [validationMessage, setValidationMessage] = useState<string>('');
 
-  // Reset API key and message if defaultModel prop changes
   useEffect(() => {
     setSelectedModel(defaultModel || 'gpt-4o');
     setApiKey('');
     setValidationMessage('');
   }, [defaultModel]);
 
-  // Model list
   const models = {
     OpenAI: ['gpt-4o', 'gpt-4o-mini', 'o1-mini', 'o3-mini'],
     Anthropic: ['claude-3-sonnet-latest', 'claude-3-haiku-latest'],
     DeepSeek: ['deepseek-chat'],
-    Ollama: ['llama3', 'mistral', 'gemma'],  // to be integrated furthur
+    Ollama: ['llama3', 'mistral', 'gemma'],  // to be integrated later
   };
 
-  // Helper to flatten the models object for the dropdown
   const allModelOptions = Object.entries(models).flatMap(([provider, modelList]) =>
     modelList.map(model => ({ value: model, label: `${model} (${provider})` }))
   );
 
-  // Function to find the provider of a given model name
   const getProviderForModel = (modelName: string): string | null => {
     for (const [provider, modelList] of Object.entries(models)) {
       if (modelList.includes(modelName)) {
-        return provider; // Return the provider name (e.g., 'OpenAI', 'Ollama')
+        return provider;
       }
     }
-    return null; // Model not found in our list
+    return null; // Model not found
   };
 
-  // Determine if the currently selected model requires an API key
   const providerOfSelectedModel = getProviderForModel(selectedModel);
 
-  // Only models from the 'Ollama' provider do NOT require an API key.
-  // All other providers, or if the provider is unknown, will require a key.
   const requiresApiKey = providerOfSelectedModel !== 'Ollama';
 
 
   const handleModelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedModel(event.target.value);
-    setApiKey(''); // Reset API key when model changes
+    setApiKey('');
     setIsApiKeyVisible(false);
-    setValidationMessage(''); // Clear validation message
+    setValidationMessage('');
   };
 
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setApiKey(event.target.value);
-    setValidationMessage(''); // Clear validation message
+    setValidationMessage('');
   };
 
   const handleValidate = () => {
@@ -84,15 +74,12 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({ onConfigValidated, defa
       setValidationMessage('API key is required for this model.');
       return;
     }
-    // Call the callback prop passed from the parent
     onConfigValidated(selectedModel, apiKey);
     setValidationMessage('Configuration applied successfully!');
     
-    // Clear the API key field and reset visibility after successful validation
     setApiKey('');
     setIsApiKeyVisible(false);
 
-    // Clear message after a few seconds
     setTimeout(() => setValidationMessage(''), 5000);
   };
 
@@ -152,7 +139,6 @@ const ModelSelection: React.FC<ModelSelectionProps> = ({ onConfigValidated, defa
         )}
       </div>
 
-      {/* Validation Message */}
       {validationMessage && (
         <p className={`text-sm mt-2 mb-3 ${validationMessage.includes('required') ? 'text-red-400' : 'text-green-400'}`}>
           {validationMessage}

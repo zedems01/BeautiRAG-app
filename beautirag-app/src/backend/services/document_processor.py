@@ -93,7 +93,6 @@ def process_audio(file_path: Path) -> list[Document]:
     try:
         result = WHISPER_MODEL.transcribe(str(file_path), fp16=False) # fp16=False for CPU
         text = result['text']
-        # logger.info(f"EXTRACTED TEXT:\n{text[:100]}")
 
         if not text.strip():
             logger.warning(f"No text transcribed from audio: {file_path}")
@@ -102,7 +101,6 @@ def process_audio(file_path: Path) -> list[Document]:
         saved_path = save_processed_text(text, file_path.name)
         metadata = {"source": str(file_path.name), "processed_path": str(saved_path)}
         doc = Document(page_content=text, metadata=metadata)
-        # logger.info(f"LANGCHAIN FORMATED EXTRACTED TEXT:\n{doc.page_content}")
         return [doc]
     except Exception as e:
         logger.error(f"Error processing audio {file_path}: {e}", exc_info=True)
@@ -178,6 +176,3 @@ def load_and_process_document(file_path: Path) -> list[Document]:
         logger.error(f"Failed to load or process document {file_path}: {e}", exc_info=True)
         return []
 
-if __name__ == '__main__':
-    # Test code (todo further...)
-    pass

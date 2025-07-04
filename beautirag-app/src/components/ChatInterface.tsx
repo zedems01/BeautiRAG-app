@@ -11,8 +11,8 @@ interface Message {
 }
 
 interface ChatInterfaceProps {
-  selectedModel: string; // Passed down from parent
-  apiKey: string;        // Passed down from parent
+  selectedModel: string;
+  apiKey: string;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) => {
@@ -32,17 +32,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
 
     const userMessageText = inputValue;
     const newUserMessage: Message = {
-      id: Date.now(), // Using timestamp for potentially better unique ID
+      id: Date.now(),
       text: userMessageText,
       sender: 'user',
     };
 
-    // Add user message
+    // Add messages
     setMessages(prevMessages => [...prevMessages, newUserMessage]);
-    setInputValue(''); // Clear input field
+    setInputValue('');
     setIsBotLoading(true);
 
-    // Add a temporary loading message for the bot
     const loadingBotMessage: Message = {
       id: Date.now() + 1,
       text: '...',
@@ -52,7 +51,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
     setMessages(prevMessages => [...prevMessages, loadingBotMessage]);
 
     try {
-      // Use environment variable for backend URL
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const response = await fetch(`${backendUrl}/query/`, {
         method: 'POST',
@@ -62,7 +60,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
         body: JSON.stringify({
           query: userMessageText,
           model_name: selectedModel,
-          api_key: apiKey || null, // Send null if empty
+          api_key: apiKey || null,
         }),
       });
 
@@ -77,12 +75,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
       }
 
       const finalBotMessage: Message = {
-        id: loadingBotMessage.id, // Reuse ID to replace the loading message
+        id: loadingBotMessage.id,
         text: botResponseText,
         sender: 'bot',
       };
 
-      // Replace loading message with actual response
       setMessages(prevMessages =>
         prevMessages.map(msg => (msg.id === finalBotMessage.id ? finalBotMessage : msg))
       );
@@ -90,7 +87,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
     } catch (error) {
       console.error('Failed to fetch query response:', error);
       const errorBotMessage: Message = {
-        id: loadingBotMessage.id, // Reuse ID to replace the loading message
+        id: loadingBotMessage.id,
         text: `Error: ${error instanceof Error ? error.message : 'Network error'}`,
         sender: 'bot',
       };
@@ -104,14 +101,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(event.target.value);
-    // Auto-adjust height
     event.target.style.height = 'inherit';
     event.target.style.height = `${event.target.scrollHeight}px`;
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault(); // Prevent newline on Enter
+      event.preventDefault();
       handleSendMessage();
     }
   };
@@ -132,7 +128,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
           messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-sm lg:max-w-lg px-4 py-2 rounded-xl shadow ${msg.sender === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-gray-700 text-gray-200 rounded-bl-none'} ${msg.isLoading ? 'animate-pulse' : ''}` // Add pulsing animation for loading
+                className={`max-w-sm lg:max-w-lg px-4 py-2 rounded-xl shadow ${msg.sender === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-gray-700 text-gray-200 rounded-bl-none'} ${msg.isLoading ? 'animate-pulse' : ''}`
               }
               >
                 {msg.text}
@@ -153,21 +149,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, apiKey }) 
           rows={1}
           className="flex-grow px-3 py-2 mr-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-500 resize-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700"
           style={{ maxHeight: '100px' }}
-          disabled={isBotLoading} // Disable input while bot is thinking
+          disabled={isBotLoading}
         />
         <button
           onClick={handleSendMessage}
           className="flex-shrink-0 px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-850 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
-          disabled={!inputValue.trim() || isBotLoading} // Disable button if input is empty or bot is loading
+          disabled={!inputValue.trim() || isBotLoading}
         >
           {isBotLoading ? (
-            // Simple spinner
             <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           ) : (
-            // Send Icon
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.894 2.886l4.108 4.108a1 1 0 010 1.414l-4.108 4.108A1 1 0 119.48 11.104l1.886-1.887H4a1 1 0 110-2h7.365l-1.886-1.886a1 1 0 111.414-1.415z"/>
             </svg>

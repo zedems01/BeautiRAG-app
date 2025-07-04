@@ -20,7 +20,6 @@ from ..core.config import (
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# --- LLM Initialization ---
 def get_llm(model_name: str, api_key: Optional[str] = None, **kwargs):
     """Initializes and returns the specified LangChain LLM instance."""
     logger.info(f"Initializing LLM: {model_name}")
@@ -65,7 +64,6 @@ def get_llm(model_name: str, api_key: Optional[str] = None, **kwargs):
         logger.error(f"Failed to initialize LLM '{model_name}': {e}", exc_info=True)
         raise
 
-# --- RAG Chain Definition ---
 def create_rag_chain(model_name: str = "gpt-4o", api_key: Optional[str] = None, llm_kwargs: Optional[Dict[str, Any]] = None):
     """Creates the full RAG chain using LCEL."""
     vector_store = get_vector_store()
@@ -79,7 +77,6 @@ def create_rag_chain(model_name: str = "gpt-4o", api_key: Optional[str] = None, 
 
     llm = get_llm(model_name, api_key, **(llm_kwargs or {}))
 
-    # Define the prompt template
     template = """
         You are a helpful assistant for question-answering tasks.
         Be friendly and concise.
@@ -100,7 +97,6 @@ def create_rag_chain(model_name: str = "gpt-4o", api_key: Optional[str] = None, 
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
 
-    # Construct the RAG chain using LCEL
     rag_chain = (
         RunnableParallel(
             context=retriever | format_docs,
@@ -108,18 +104,17 @@ def create_rag_chain(model_name: str = "gpt-4o", api_key: Optional[str] = None, 
         )
         | prompt
         | llm
-        | StrOutputParser() # Parse the LLM ChatMessage output to a string
+        | StrOutputParser()
     )
 
     logger.info(f"RAG chain created successfully with model: {model_name}")
     return rag_chain
 
-# --- Query Function ---
-def query_rag(query: str, model_name: str = "gpt-3.5-turbo", api_key: Optional[str] = None) -> str:
+def query_rag(query: str, model_name: str = "gpt-4o", api_key: Optional[str] = None) -> str:
     """Queries the RAG chain with the provided question and model selection."""
     logger.info(f"Received query: '{query}' for model: {model_name}")
     try:
-        rag_chain = create_rag_chain(model_name=model_name, api_key=api_key)
+        rag_chain = create_rag_chain(model_name=model_name, api_key=api_key, llm_kwargs={"temperature": 0.7})
         response = rag_chain.invoke(query)
         logger.info(f"Generated response: '{response}'")
         return response
@@ -133,7 +128,3 @@ def query_rag(query: str, model_name: str = "gpt-3.5-turbo", api_key: Optional[s
         logger.error(f"An unexpected error occurred during the RAG query: {e}", exc_info=True)
         return "An unexpected error occurred while processing your request."
 
-
-if __name__ == '__main__':
-    # Test code (todo further...)
-    pass

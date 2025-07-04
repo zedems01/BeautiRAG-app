@@ -14,7 +14,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set NEXT_TELEMETRY_DISABLED to 1 to   
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN npm run build
